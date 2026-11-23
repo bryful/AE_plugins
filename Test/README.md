@@ -38,12 +38,14 @@ msbuild .\TestNoise.sln /p:Configuration=Release /p:Platform=x64
 msbuild .\TestNoise.sln /t:Rebuild /p:Configuration=Release /p:Platform=x64 /p:AESDKRoot="D:\SDK\AfterEffectsSDK AE2026"
 ```
 
-PC固有の設定は `../Build/SDK.local.props` に記載できる（Git対象外）。
+追加のSDK設定は `../Build/SDK.local.props` に記載できる（Git管理対象）。
+初期状態は設定なしで、`SDK.props` の既定値を使用する。
+共有する設定には、個人環境の絶対パスではなく相対パスを使用する。
 
 ```xml
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AESDKRoot>D:\SDK\AfterEffectsSDK AE2025</AESDKRoot>
+    <AESDKRoot>$(MSBuildThisFileDirectory)..\AfterEffectsSDK AE2025</AESDKRoot>
   </PropertyGroup>
 </Project>
 ```
@@ -73,5 +75,6 @@ AE上でのロード、UI表示、8/16/32 bpcの実描画は未確認。
 
 ## Git管理
 
-SDK、生成バイナリ、ビルド中間物、PC固有設定はルートの `.gitignore` で除外。
+SDK、生成バイナリ、ビルド中間物はルートの `.gitignore` で除外。
+`Build/SDK.local.props` はGit管理対象。
 SDKは各PCに別途配置する。SDK自体は変更していない。

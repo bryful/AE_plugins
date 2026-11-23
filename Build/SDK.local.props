@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- このファイルはGit管理対象。SDK.propsの既定値を変更したい場合に設定する。
+       共有時は、個人環境の絶対パスではなく相対パスを使用する。
+       未設定のままならSDK.propsで指定したSDKを使用する。
+  <PropertyGroup>
+    <AESDKRoot>$(MSBuildThisFileDirectory)..\AfterEffectsSDK AE2025</AESDKRoot>
+  </PropertyGroup>
+  -->
+</Project>
