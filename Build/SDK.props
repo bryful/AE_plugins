@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- Change this one path to select a different SDK. /p:AESDKRoot=... overrides it. -->
+    <AESDKRoot Condition="'$(AESDKRoot)'==''">$(MSBuildThisFileDirectory)..\AfterEffectsSDK AE2025</AESDKRoot>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)SDK.local.props" Condition="Exists('$(MSBuildThisFileDirectory)SDK.local.props')" />
+</Project>

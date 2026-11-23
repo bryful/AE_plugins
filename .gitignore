@@ -1,0 +1,11 @@
+/AfterEffectsSDK*/
+/Build/SDK.local.props
+**/.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.pdb
+*.aex
+*.log
+*.binlog
