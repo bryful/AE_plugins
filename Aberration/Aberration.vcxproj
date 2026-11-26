@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EFCED7D4-DB37-46F2-97F0-6B7F7FDB81E4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseDebugLibraries Condition="'$(Configuration)'=='Debug'">true</UseDebugLibraries>
+    <UseDebugLibraries Condition="'$(Configuration)'=='Release'">false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\Build\SDK.props" />
+  <PropertyGroup>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)'=='Release'">$(ProjectDir)..\outputPlugins\</OutDir>
+    <AEDebugPlugInDir Condition="'$(AEDebugPlugInDir)'==''">C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore</AEDebugPlugInDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>Aberration</TargetName><TargetExt>.aex</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AESDKRoot)\Examples\Headers;$(AESDKRoot)\Examples\Headers\SP;$(AESDKRoot)\Examples\Util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;MSWindows;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard><AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <WarningLevel>Level4</WarningLevel><PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
+      <Optimization Condition="'$(Configuration)'=='Debug'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)'=='Release'">MaxSpeed</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link><GenerateDebugInformation>true</GenerateDebugInformation></Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Aberration.cpp" />
+    <CustomBuild Include="AberrationPiPL.r">
+      <Message>Generating Aberration PiPL with the AE SDK PiPLtool</Message>
+      <Command>"$(CLToolPath)cl.exe" /nologo /EP /I "$(AESDKRoot)\Examples\Headers" "%(FullPath)" &gt; "$(IntDir)%(Filename).rr"
+if errorlevel 1 exit /b 1
+"$(AESDKRoot)\Examples\Resources\PiPLtool.exe" "$(IntDir)%(Filename).rr" "$(IntDir)%(Filename).rrc"
+if errorlevel 1 exit /b 1
+"$(CLToolPath)cl.exe" /nologo /D MSWindows /EP "$(IntDir)%(Filename).rrc" &gt; "$(IntDir)%(Filename).rc"
+if errorlevel 1 exit /b 1</Command>
+      <AdditionalInputs>$(AESDKRoot)\Examples\Headers\AEConfig.h;$(AESDKRoot)\Examples\Headers\AE_EffectVers.h;$(AESDKRoot)\Examples\Resources\PiPLtool.exe;$(MSBuildProjectFullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Outputs>$(IntDir)%(Filename).rr;$(IntDir)%(Filename).rrc;$(IntDir)%(Filename).rc</Outputs>
+      <LinkObjects>false</LinkObjects>
+    </CustomBuild>
+    <ResourceCompile Include="$(IntDir)AberrationPiPL.rc" />
+  </ItemGroup>
+  <Target Name="ValidateSDK" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(AESDKRoot)\Examples\Headers\AE_Effect.h')" Text="AE SDK not found. Set AESDKRoot in Build/SDK.props or pass /p:AESDKRoot=..." />
+    <Error Condition="!Exists('$(AESDKRoot)\Examples\Resources\PiPLtool.exe')" Text="SDK PiPLtool.exe not found." />
+  </Target>
+  <Target Name="DeployDebugPlugin" AfterTargets="Build" Condition="'$(Configuration)'=='Debug' and '$(DeployAEDebugPlugin)'!='false'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AEDebugPlugInDir)" SkipUnchangedFiles="true" />
+  </Target>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
+
