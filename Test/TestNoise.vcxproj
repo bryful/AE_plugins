@@ -39,18 +39,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="TestNoise.cpp" />
-    <None Include="TestNoisePiPL.r" />
+    <CustomBuild Include="TestNoisePiPL.r">
+      <Message>Generating TestNoise PiPL with the AE SDK PiPLtool</Message>
+      <Command>"$(CLToolPath)cl.exe" /nologo /EP /source-charset:utf-8 /I "$(AESDKRoot)\Examples\Headers" "%(FullPath)" &gt; "$(IntDir)%(Filename).rr"
+if errorlevel 1 exit /b 1
+"$(AESDKRoot)\Examples\Resources\PiPLtool.exe" "$(IntDir)%(Filename).rr" "$(IntDir)%(Filename).rrc"
+if errorlevel 1 exit /b 1
+"$(CLToolPath)cl.exe" /nologo /D MSWindows /EP "$(IntDir)%(Filename).rrc" &gt; "$(IntDir)%(Filename).rc"
+if errorlevel 1 exit /b 1</Command>
+      <AdditionalInputs>$(AESDKRoot)\Examples\Headers\AEConfig.h;$(AESDKRoot)\Examples\Headers\AE_EffectVers.h;$(AESDKRoot)\Examples\Resources\PiPLtool.exe;$(MSBuildProjectFullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Outputs>$(IntDir)%(Filename).rr;$(IntDir)%(Filename).rrc;$(IntDir)%(Filename).rc</Outputs>
+      <LinkObjects>false</LinkObjects>
+    </CustomBuild>
     <ResourceCompile Include="$(IntDir)TestNoisePiPL.rc" />
   </ItemGroup>
   <Target Name="ValidateSDK" BeforeTargets="PrepareForBuild">
     <Error Condition="!Exists('$(AESDKRoot)\Examples\Headers\AE_Effect.h')" Text="AE SDK not found. Set AESDKRoot in Build/SDK.props or pass /p:AESDKRoot=..." />
     <Error Condition="!Exists('$(AESDKRoot)\Examples\Resources\PiPLtool.exe')" Text="SDK PiPLtool.exe not found." />
-  </Target>
-  <!-- Always regenerate: changing the selected SDK must also update the resource. -->
-  <Target Name="GeneratePiPL" BeforeTargets="ResourceCompile" DependsOnTargets="PrepareForBuild;ValidateSDK">
-    <Exec Command="&quot;$(CLToolPath)cl.exe&quot; /nologo /I &quot;$(AESDKRoot)\Examples\Headers&quot; /EP &quot;$(ProjectDir)TestNoisePiPL.r&quot; &gt; &quot;$(IntDir)TestNoisePiPL.rr&quot;" />
-    <Exec Command="&quot;$(AESDKRoot)\Examples\Resources\PiPLtool.exe&quot; &quot;$(IntDir)TestNoisePiPL.rr&quot; &quot;$(IntDir)TestNoisePiPL.rrc&quot;" />
-    <Exec Command="&quot;$(CLToolPath)cl.exe&quot; /nologo /D MSWindows /EP &quot;$(IntDir)TestNoisePiPL.rrc&quot; &gt; &quot;$(IntDir)TestNoisePiPL.rc&quot;" />
   </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
